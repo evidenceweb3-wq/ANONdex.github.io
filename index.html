@@ -83,31 +83,60 @@
   }
 
   /* ===== Mobile Styles ===== */
-  @media (max-width: 767px) {
-    #character {
-      top: 100%;
-      width: 500px;
-    }
-    #charName {
-      top: 10px;
-      font-size: 36px;
-    }
-    #priceContainer {
-      top: 70px;
-      font-size: 18px;
-    }
-    #change24h {
-      top: 110px;
-      font-size: 28px;
-    }
-    #socialLinks {
-      top: 200px;
-    }
-    #socialLinks img {
-      width: 32px;
-      height: 32px;
-    }
+@media (max-width: 767px) {
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    overflow: hidden;
+    padding-top: 10px;
   }
+
+  #character {
+    position: relative;
+    top: 0;
+    width: 250px; /* adjust as needed */
+    margin-top: 20px;
+  }
+
+  #charName {
+    position: relative;
+    top: 0;
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  #priceChangeContainer {
+    position: relative;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    font-size: 18px;
+    gap: 8px; /* small space between price and 24h change */
+    margin-bottom: 10px;
+  }
+
+  #change24h {
+    font-size: 28px;
+  }
+
+  #socialLinks {
+    position: relative;
+    top: 0;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  #socialLinks img {
+    width: 32px;
+    height: 32px;
+  }
+}
 </style>
 </head>
 <body>
@@ -210,3 +239,4 @@ draw();
 
 </body>
 </html>
+
