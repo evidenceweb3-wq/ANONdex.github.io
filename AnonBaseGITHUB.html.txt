@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ANON - Matrix</title>
+<style>
+  :root {
+    /* Character */
+    --char-width-desktop: 800px;
+    --char-width-mobile: 180px;
+    --char-opacity: 0.95;
+    --char-glow: 15px;
+    --char-top: 80%;
+
+    /* Top Texts */
+    --name-top: 20px;
+    --name-font: 32px;
+    --price-top: 70px;
+    --price-font: 24px;
+    --change-top: 110px;
+    --change-font: 20px;
+
+    /* Social Icons */
+    --social-top: 150px;
+    --social-size: 32px;
+
+    /* Matrix */
+    --matrix-col-spacing: 22;
+    --matrix-line-spacing: 19;
+    --matrix-speed: 20;
+    --matrix-fade: 0.1;
+  }
+
+  html, body { margin:0; height:100%; font-family:Segoe UI,sans-serif; overflow:hidden; background:black; color:#fff; }
+
+  #character { 
+    position: absolute; 
+    top: var(--char-top); 
+    left:50%; 
+    transform: translate(-50%, -30%); 
+    max-width: var(--char-width-desktop); 
+    opacity: var(--char-opacity); 
+    filter: drop-shadow(0 0 var(--char-glow) lime);
+    z-index:2;
+  }
+
+  #charName {
+    position: fixed; 
+    top: var(--name-top); 
+    left:50%; 
+    transform:translateX(-50%); 
+    font-size: var(--name-font); 
+    font-weight:bold; 
+    text-shadow: 0 0 8px lime;
+  }
+
+  #priceContainer {
+    position: fixed; 
+    top: var(--price-top); 
+    left:50%; 
+    transform:translateX(-50%); 
+    font-size: var(--price-font); 
+    text-shadow: 0 0 6px lime;
+  }
+
+  #change24h {
+    position: fixed; 
+    top: var(--change-top); 
+    left:50%; 
+    transform:translateX(-50%); 
+    font-size: var(--change-font); 
+    text-shadow: 0 0 6px lime;
+  }
+
+  #socialLinks {
+    position: fixed; 
+    top: var(--social-top); 
+    left:50%; 
+    transform:translateX(-50%); 
+    display:flex; 
+    gap:12px; 
+    z-index:5;
+  }
+  #socialLinks img { width: var(--social-size); height: var(--social-size); cursor:pointer; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)); transition: transform 0.2s ease; }
+  #socialLinks img:hover { transform:scale(1.2); }
+
+  #particleCanvas { 
+    position:absolute; 
+    top:0; 
+    left:0; 
+    width:100%; 
+    height:100%; 
+    z-index:0;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 767px) {
+    #character { max-width: var(--char-width-mobile); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+<div id="charName">ANON</div>
+<div id="priceContainer">Loading price...</div>
+<div id="change24h"></div>
+
+<img id="character" src="https://i.postimg.cc/yYZPj0zX/Anon1.png" alt="ANON">
+
+<div id="socialLinks">
+  <a href="https://x.com/i/communities/1954607470753861824" target="_blank" title="X">
+    <img src="https://i.postimg.cc/jSSK7CPW/XICON.png" alt="X Icon">
+  </a>
+  <a href="" target="_blank" title="Website">
+    <img src="https://i.postimg.cc/3xfhC7Ft/WICON.png" alt="Website Icon">
+  </a>
+</div>
+
+<script>
+const $price = document.getElementById('priceContainer');
+const $change = document.getElementById('change24h');
+
+// ANON DexScreener pairId & supply
+const pairId = "8eQTQLnBmEgeY9avVjrqqgX8ZVr8MRFrXEHpMrx6DGff";
+const supply = 1000000000;
+
+async function updatePrice() {
+  try {
+    const res = await fetch(`https://api.dexscreener.com/latest/dex/pairs/solana/${pairId}`);
+    const data = await res.json();
+    const price = parseFloat(data.pair.priceUsd) || 0;
+    const priceStr = price.toFixed(6);
+    const mcap = price * supply;
+    const mcapStr = mcap.toLocaleString(undefined, {maximumFractionDigits:0});
+    const changeVal = data.pair.priceChange?.h24 ?? 0;
+    const formattedChange = `${Math.abs(changeVal).toFixed(2)}%`;
+
+    $price.textContent = `Price: $${priceStr} | MCAP: $${mcapStr}`;
+    if(changeVal>0){
+      $change.textContent = `🤑 +${formattedChange}`;
+      $change.style.color = '#00ff00';
+    } else if(changeVal<0){
+      $change.textContent = `😈 -${formattedChange}`;
+      $change.style.color = '#ff3333';
+    } else {
+      $change.textContent = `0.00%`;
+      $change.style.color = '#fff';
+    }
+  } catch(e){
+    console.error(e);
+    $price.textContent = "Price unavailable";
+    $change.textContent = "";
+  }
+}
+
+updatePrice();
+setInterval(updatePrice, 30000); // refresh every 30s
+
+// ===== MATRIX EFFECT =====
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let columns = [];
+const colSpacing = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--matrix-col-spacing'));
+const lineSpacing = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--matrix-line-spacing'));
+const matrixSpeed = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--matrix-speed'));
+const fade = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--matrix-fade'));
+const chars = "アカサタナハマヤラワイキシチニヒミリウエケセテネヘメレオコソトノホモヨロヲ0123456789";
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colCount = Math.floor(canvas.width / colSpacing);
+  columns = [];
+  for(let i=0;i<colCount;i++){
+    columns[i] = Math.random() * canvas.height;
+  }
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function randomChar(){ return chars.charAt(Math.floor(Math.random()*chars.length)); }
+
+function draw(){
+  ctx.fillStyle = `rgba(0,0,0,${fade})`;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0F0';
+  ctx.font = `${lineSpacing}px monospace`;
+  for(let i=0;i<columns.length;i++){
+    ctx.fillText(randomChar(), i*colSpacing, columns[i]);
+    columns[i] += matrixSpeed;
+    if(columns[i] > canvas.height) columns[i]=0;
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+
+</body>
+</html>
