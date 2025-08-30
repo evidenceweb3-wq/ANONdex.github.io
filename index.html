@@ -5,98 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ANON - Matrix</title>
 <style>
-  :root {
-    /* Character */
-    --char-width-desktop: 800px;
-    --char-width-mobile: 180px;
-    --char-opacity: 0.95;
-    --char-glow: 15px;
-    --char-top: 80%;
-
-    /* Top Texts */
-    --name-top: 20px;
-    --name-font: 32px;
-    --price-top: 70px;
-    --price-font: 24px;
-    --change-top: 110px;
-    --change-font: 20px;
-
-    /* Social Icons */
-    --social-top: 150px;
-    --social-size: 32px;
-
-    /* Matrix */
-    --matrix-col-spacing: 22;
-    --matrix-line-spacing: 19;
-    --matrix-speed: 20;
-    --matrix-fade: 0.1;
-  }
-
   html, body { margin:0; height:100%; font-family:Segoe UI,sans-serif; overflow:hidden; background:black; color:#fff; }
-
   #character { 
     position: absolute; 
-    top: var(--char-top); 
+    top:80%; 
     left:50%; 
-    transform: translate(-50%, -30%); 
-    max-width: var(--char-width-desktop); 
-    opacity: var(--char-opacity); 
-    filter: drop-shadow(0 0 var(--char-glow) lime);
-    z-index:2;
+    transform: translate(-50%, -50%); 
+    max-width:300px; 
+    opacity:0.95; 
+    filter: drop-shadow(0 0 15px lime); 
   }
-
   #charName {
     position: fixed; 
-    top: var(--name-top); 
+    top:20px; 
     left:50%; 
     transform:translateX(-50%); 
-    font-size: var(--name-font); 
+    font-size:52px; 
     font-weight:bold; 
-    text-shadow: 0 0 8px lime;
+    text-shadow: 0 0 8px lime; 
   }
-
   #priceContainer {
     position: fixed; 
-    top: var(--price-top); 
+    top:100px; 
     left:50%; 
     transform:translateX(-50%); 
-    font-size: var(--price-font); 
+    font-size:24px; 
     text-shadow: 0 0 6px lime;
   }
-
   #change24h {
     position: fixed; 
-    top: var(--change-top); 
+    top:150px; 
     left:50%; 
     transform:translateX(-50%); 
-    font-size: var(--change-font); 
+    font-size:40px; 
     text-shadow: 0 0 6px lime;
   }
-
+  #refreshBtn {
+    position: fixed;
+    top:220px;
+    left:50%;
+    transform: translateX(-50%);
+    padding: 6px 12px;
+    font-size: 16px;
+    background: black;
+    color: lime;
+    border: 1px solid lime;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 5;
+  }
+  #refreshBtn:hover {
+    background: lime;
+    color: black;
+  }
   #socialLinks {
     position: fixed; 
-    top: var(--social-top); 
+    top:280px; 
     left:50%; 
     transform:translateX(-50%); 
-    display:flex; 
-    gap:12px; 
+    display:flex; gap:12px; 
     z-index:5;
   }
-  #socialLinks img { width: var(--social-size); height: var(--social-size); cursor:pointer; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)); transition: transform 0.2s ease; }
+  #socialLinks img { width:42px; height:42px; cursor:pointer; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)); transition: transform 0.2s ease; }
   #socialLinks img:hover { transform:scale(1.2); }
-
   #particleCanvas { 
     position:absolute; 
     top:0; 
     left:0; 
     width:100%; 
     height:100%; 
-    z-index:0;
-  }
-
-  /* Mobile adjustments */
-  @media (max-width: 767px) {
-    #character { max-width: var(--char-width-mobile); }
+    z-index:0; 
   }
 </style>
 </head>
@@ -107,21 +85,23 @@
 <div id="charName">ANON</div>
 <div id="priceContainer">Loading price...</div>
 <div id="change24h"></div>
+<button id="refreshBtn">Refresh</button>
 
 <img id="character" src="https://i.postimg.cc/yYZPj0zX/Anon1.png" alt="ANON">
 
 <div id="socialLinks">
   <a href="https://x.com/i/communities/1954607470753861824" target="_blank" title="X">
-    <img src="https://i.postimg.cc/jSSK7CPW/XICON.png" alt="X Icon">
+    <img src="https://i.postimg.cc/ncpwFVXC/XICON2.png" alt="X Icon">
   </a>
   <a href="" target="_blank" title="Website">
-    <img src="https://i.postimg.cc/3xfhC7Ft/WICON.png" alt="Website Icon">
+    <img src="https://i.postimg.cc/9Fbgr391/WICON2.png" alt="Website Icon">
   </a>
 </div>
 
 <script>
 const $price = document.getElementById('priceContainer');
 const $change = document.getElementById('change24h');
+const refreshBtn = document.getElementById('refreshBtn');
 
 // ANON DexScreener pairId & supply
 const pairId = "8eQTQLnBmEgeY9avVjrqqgX8ZVr8MRFrXEHpMrx6DGff";
@@ -156,17 +136,20 @@ async function updatePrice() {
   }
 }
 
+// Trigger manual refresh on button click
+refreshBtn.addEventListener('click', updatePrice);
+
 updatePrice();
-setInterval(updatePrice, 30000); // refresh every 30s
+setInterval(updatePrice, 30000); // automatic refresh every 30s
 
 // ===== MATRIX EFFECT =====
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 let columns = [];
-const colSpacing = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--matrix-col-spacing'));
-const lineSpacing = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--matrix-line-spacing'));
-const matrixSpeed = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--matrix-speed'));
-const fade = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--matrix-fade'));
+const colSpacing = 22;
+const lineSpacing = 19;
+const matrixSpeed = 20;
+const fade = 0.1;
 const chars = "アカサタナハマヤラワイキシチニヒミリウエケセテネヘメレオコソトノホモヨロヲ0123456789";
 
 function resizeCanvas(){
@@ -200,4 +183,3 @@ draw();
 
 </body>
 </html>
-
