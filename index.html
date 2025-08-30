@@ -5,76 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ANON - Matrix</title>
 <style>
-  html, body { margin:0; height:100%; font-family:Segoe UI,sans-serif; overflow:hidden; background:black; color:#fff; }
-  #character { 
-    position: absolute; 
-    top:80%; 
-    left:50%; 
-    transform: translate(-50%, -50%); 
-    max-width:300px; 
-    opacity:0.95; 
-    filter: drop-shadow(0 0 15px lime); 
+  html, body {
+    margin:0;
+    height:100%;
+    font-family:Segoe UI,sans-serif;
+    overflow:hidden;
+    background:black;
+    color:#fff;
   }
+
+  /* ===== Desktop Styles ===== */
+  #character {
+    position: absolute;
+    top: 95%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 350px; /* desktop size */
+    opacity:0.95;
+    filter: drop-shadow(0 0 15px lime);
+  }
+
   #charName {
-    position: fixed; 
-    top:20px; 
-    left:50%; 
-    transform:translateX(-50%); 
-    font-size:52px; 
-    font-weight:bold; 
-    text-shadow: 0 0 8px lime; 
-  }
-  #priceContainer {
-    position: fixed; 
-    top:100px; 
-    left:50%; 
-    transform:translateX(-50%); 
-    font-size:24px; 
-    text-shadow: 0 0 6px lime;
-  }
-  #change24h {
-    position: fixed; 
-    top:150px; 
-    left:50%; 
-    transform:translateX(-50%); 
-    font-size:40px; 
-    text-shadow: 0 0 6px lime;
-  }
-  #refreshBtn {
     position: fixed;
-    top:220px;
-    left:50%;
+    top: 20px;
+    left: 50%;
     transform: translateX(-50%);
-    padding: 6px 12px;
-    font-size: 16px;
-    background: black;
-    color: lime;
-    border: 1px solid lime;
-    border-radius: 4px;
-    cursor: pointer;
-    z-index: 5;
+    font-size: 52px;
+    font-weight: bold;
+    text-shadow: 0 0 8px lime;
   }
-  #refreshBtn:hover {
-    background: lime;
-    color: black;
+
+  #priceContainer {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    text-shadow: 0 0 6px lime;
   }
+
+  #change24h {
+    position: fixed;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    text-shadow: 0 0 6px lime;
+  }
+
   #socialLinks {
-    position: fixed; 
-    top:280px; 
-    left:50%; 
-    transform:translateX(-50%); 
-    display:flex; gap:12px; 
+    position: fixed;
+    top: 230px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
     z-index:5;
   }
-  #socialLinks img { width:42px; height:42px; cursor:pointer; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)); transition: transform 0.2s ease; }
-  #socialLinks img:hover { transform:scale(1.2); }
-  #particleCanvas { 
-    position:absolute; 
-    top:0; 
-    left:0; 
-    width:100%; 
-    height:100%; 
-    z-index:0; 
+
+  #socialLinks img {
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
+    transition: transform 0.2s ease;
+  }
+
+  #socialLinks img:hover { transform: scale(1.2); }
+
+  #particleCanvas {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+  }
+
+  /* ===== Mobile Styles ===== */
+  @media (max-width: 767px) {
+    #character {
+      top: 70%;
+      width: 200px;
+    }
+    #charName {
+      top: 10px;
+      font-size: 36px;
+    }
+    #priceContainer {
+      top: 70px;
+      font-size: 18px;
+    }
+    #change24h {
+      top: 110px;
+      font-size: 28px;
+    }
+    #socialLinks {
+      top: 200px;
+    }
+    #socialLinks img {
+      width: 32px;
+      height: 32px;
+    }
   }
 </style>
 </head>
@@ -85,7 +117,6 @@
 <div id="charName">ANON</div>
 <div id="priceContainer">Loading price...</div>
 <div id="change24h"></div>
-<button id="refreshBtn">Refresh</button>
 
 <img id="character" src="https://i.postimg.cc/yYZPj0zX/Anon1.png" alt="ANON">
 
@@ -101,7 +132,6 @@
 <script>
 const $price = document.getElementById('priceContainer');
 const $change = document.getElementById('change24h');
-const refreshBtn = document.getElementById('refreshBtn');
 
 // ANON DexScreener pairId & supply
 const pairId = "8eQTQLnBmEgeY9avVjrqqgX8ZVr8MRFrXEHpMrx6DGff";
@@ -135,9 +165,6 @@ async function updatePrice() {
     $change.textContent = "";
   }
 }
-
-// Trigger manual refresh on button click
-refreshBtn.addEventListener('click', updatePrice);
 
 updatePrice();
 setInterval(updatePrice, 30000); // automatic refresh every 30s
